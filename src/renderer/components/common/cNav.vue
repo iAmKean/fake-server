@@ -23,6 +23,7 @@ export default {
 	methods: {
 		close() {
 			// todo: add warning modal
+			// todo: where there is a running add warning
 
 			this.loadingClose = true;
 			this.$emit("on-close", true)

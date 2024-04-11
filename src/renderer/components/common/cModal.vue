@@ -9,7 +9,7 @@
 		</div>
 		<slot name="bodycontent"></slot>
 		<div slot="footer">
-			<Button type="success" v-if="showFooter" class="btn-style-2" style="width:200px;height:36px;" :loading="isClickOK"
+			<Button :type="type" v-if="showFooter" class="btn-style-2" style="width:200px;height:36px;" :loading="isClickOK"
 				@click="ok"><span>{{ okText }}</span></Button>
 		</div>
 	</Modal>
@@ -49,6 +49,10 @@ export default {
 		okText: {
 			type: String,
 			default: 'Save',
+		},
+		type: {
+			type: String,
+			default: 'success',
 		},
 		width: {
 			type: Number,

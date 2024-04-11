@@ -8,7 +8,7 @@
 					? currentAPI : 'None' }}</span></span>
 			</p>
 			<a href="#" slot="extra">
-				<Button @click.prevent="deleteAll" type="error">Delete All
+				<Button :disabled="tableData.length == 0" @click.prevent="showDeleteApi = true;" type="error">Delete All
 					<Icon class="trash-icon" type="md-trash" size="20" />
 				</Button>
 
@@ -18,7 +18,7 @@
 			</a>
 
 			<div>
-				<cTable></cTable>
+				<cTable ref="cTable" @get-table-data="getTableData($event)"></cTable>
 			</div>
 		</Card>
 
@@ -51,6 +51,15 @@
 			</template>
 		</cModal>
 
+		<cModal :width="350" :title="'Delete All'" :okText="'Confirm'" :showModal="showDeleteApi" :type="'error'"
+			:isClickOK="showDeleteApi_loading" @ok="deleteAll()" @close="showDeleteApi = false;">
+			<template slot="bodycontent">
+				<div style="text-align: center">
+					Are you sure you want to delete all items?
+				</div>
+			</template>
+		</cModal>
+
 	</div>
 </template>
 
@@ -74,14 +83,16 @@ export default {
 			currentAPI: '',
 			showModalNewAPI: false,
 			showModalNewAPI_loading: false,
-
+			showDeleteApi: false,
+			showDeleteApi_loading: false,
+			tableData: [],
 			formValidate: {
-				// name: 'test',
-				// url: 'https://jsdoc.app/about-getting-started',
-				// path: 'D:\\ThinkbitSolutionsProjects\\projects\\local-test-server\\index.js',
-				name: '',
-				url: '',
-				path: '',
+				name: 'test',
+				url: 'https://jsdoc.app/about-getting-started',
+				path: 'D:\\ThinkbitSolutionsProjects\\projects\\local-test-server\\index.js',
+				// name: '',
+				// url: '',
+				// path: '',
 			},
 			ruleValidate: {
 				name: [
@@ -182,32 +193,55 @@ export default {
 			}
 		},
 		saveNewAPI() {
-			this.showModalNewAPI_loading = true;
+			try {
+				this.showModalNewAPI_loading = true;
 
-			var api_data = [];
-			if (fn.localStorage.get('API_DATA')) {
-				var temp = fn.localStorage.get('API_DATA');
-				temp = fn.serilizer.deserialize(temp);
-				api_data = temp;
-				api_data.push(this.formValidate)
-			} else {
-				api_data.push(this.formValidate)
-			}
+				var api_data = [];
+				if (fn.localStorage.get('API_DATA')) {
+					var temp = fn.localStorage.get('API_DATA');
+					temp = fn.serilizer.deserialize(temp);
+					api_data = temp;
+					api_data.unshift(this.formValidate)
+				} else {
+					api_data.unshift(this.formValidate)
+				}
 
-			fn.localStorage.set('API_DATA', fn.serilizer.serialize(api_data));
-			setTimeout(() => {
-				this.$Message.success('Success!');
+				fn.localStorage.set('API_DATA', fn.serilizer.serialize(api_data));
+				setTimeout(() => {
+					this.$Message.success('Success!');
+					this.showModalNewAPI_loading = false;
+					this.showModalNewAPI = false;
+					this.refreshTableData();
+				}, 2000);
+			} catch (error) {
 				this.showModalNewAPI_loading = false;
-				this.showModalNewAPI = false;
-			}, 2000);
+				this.$Message.error('Error!');
+			}
+		},
+		refreshTableData() {
+			const { cTable } = this.$refs;
+			if (cTable) {
+				cTable.getData();
+			}
 		},
 		deleteAll() {
-			// todo: opens modal to input  
-			console.log("deleteAll")
+			this.showDeleteApi_loading = true;
+
+			fn.localStorage.remove('API_DATA');
+			setTimeout(() => {
+				this.showDeleteApi_loading = false;
+				this.showDeleteApi = false;
+			}, 1000);
+
+			this.refreshTableData();
 		},
 		newAPI() {
 			this.showModalNewAPI = true;
-		}
+		},
+		getTableData(e) {
+			this.tableData = e;
+			console.log("getTableData", e)
+		},
 	}
 }
 </script>
