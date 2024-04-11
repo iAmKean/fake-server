@@ -3,7 +3,6 @@
 
 		<template slot-scope="{ row, index }" slot="url">
 			<span>{{ row.url }}</span>
-			<!-- todo: add copy icon -->
 			<Icon type="md-copy" color="#2d8cf0" size="20" style="margin-left: 10px;cursor: pointer;"
 				@click="copy(row)" />
 		</template>
