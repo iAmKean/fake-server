@@ -3,7 +3,9 @@
 		<div>
 			<div class="title">Fake Server API</div>
 			<div class="btn-options">
-				<Button :disabled="loadingClose" type="error" @click="close()">Close</Button>
+				<Button :disabled="loadingClose" type="error" @click="close()">Close
+					<Icon type="ios-undo" size="20" />
+				</Button>
 			</div>
 		</div>
 	</div>
@@ -20,6 +22,8 @@ export default {
 	mounted() { },
 	methods: {
 		close() {
+			// todo: add warning modal
+
 			this.loadingClose = true;
 			this.$emit("on-close", true)
 			setTimeout(() => {

@@ -9,7 +9,3 @@ export default {
 	name: 'fake-server'
 }
 </script>
-
-<style>
-/* CSS */
-</style>
