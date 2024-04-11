@@ -24,6 +24,8 @@
 <script>
 
 import { tableAPICols } from "@/utils/table";
+import { fn } from "@/utils/fn";
+
 export default {
 	data() {
 		return {
@@ -32,30 +34,20 @@ export default {
 		}
 	},
 	mounted() {
-		setTimeout(() => {
-			this.tableData = [
-				{
-					name: 'Vana API',
-					path: 'C:',
-					url: ' http://localhost:9080/',
-					status: true,
-				},
-				{
-					name: 'Hotel101',
-					path: 'C:',
-					url: ' http://localhost:9080/',
-					status: false,
-				},
-				{
-					name: 'Hotel101',
-					path: 'C:',
-					url: ' http://localhost:9080/',
-					status: false,
-				},
-			]
-		}, 1500);
+		this.getData();
 	},
 	methods: {
+		getData() {
+			setTimeout(() => {
+				if (fn.localStorage.get('API_DATA')) {
+					var temp = fn.localStorage.get('API_DATA');
+					temp = fn.serilizer.deserialize(temp);
+					this.tableData = temp;
+				} else {
+
+				}
+			}, 1000);
+		},
 		activate() { },
 		shutDown() { },
 		copy() { },

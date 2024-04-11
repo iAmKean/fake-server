@@ -36,7 +36,7 @@
 								<Input v-model="formValidate.path"
 									placeholder="Enter path ex: C:\code\node-server\index.js"></Input>
 								<span style="margin:0px 5px;font-size: 14px;">or</span>
-								<Icon type="md-folder" size="32" style="cursor: pointer;" />
+								<Icon @click="selectFilePath()" type="md-folder" size="32" style="cursor: pointer;" />
 							</div>
 
 						</FormItem>
@@ -57,12 +57,12 @@
 <script>
 import cTable from "@/components/cTable"
 import cModal from "@/components/common/cModal"
+// import { remote } from "electron";
+
 const fs = require("fs");
 const path = require("path");
 
-console.log("fs", fs)
-console.log("path", path)
-
+import { fn } from "@/utils/fn";
 export default {
 	name: '',
 	components: {
@@ -76,10 +76,12 @@ export default {
 			showModalNewAPI_loading: false,
 
 			formValidate: {
-				name: 'test',
-				url: 'https://jsdoc.app/about-getting-started',
-				path: 'D:\\ThinkbitSolutionsProjects\\projects\\local-test-server\\index.js',
-				// path: 'D:\\ThinkbitSolutionsProjects\\projects\\local-test-server\\README.md',
+				// name: 'test',
+				// url: 'https://jsdoc.app/about-getting-started',
+				// path: 'D:\\ThinkbitSolutionsProjects\\projects\\local-test-server\\index.js',
+				name: '',
+				url: '',
+				path: '',
 			},
 			ruleValidate: {
 				name: [
@@ -148,19 +150,62 @@ export default {
 				}
 			})
 		},
-		saveNewAPI() {
-			this.$Message.success('Success!');
+		selectFilePath() {
+			const win = new this.$electron.remote.BrowserWindow({
+				width: 800,
+				height: 600,
+				alwaysOnTop: true,
+				show: false,
+				modal: true,
+				acceptFirstMouse: true,
+			});
 
-			this.showModalNewAPI = false
-			console.log("saveNewAPI")
+			// var defaultPath = path.dirname(remote.process.cwd());
+			// console.log("defaultPath", defaultPath)
+			var dialog = this.$electron.remote.dialog;
+
+			var selectedFilePath = dialog.showOpenDialog(win, {
+				title: "Select File - *.js only",
+				// defaultPath: defaultPath,
+				filters: [
+					{ name: "All Files", extensions: ["*"] },
+					{ name: "Custom File Type", extensions: ["js"] },
+				],
+				buttonLabel: "Select",
+			});
+
+			if (selectedFilePath) {
+				let select_path = selectedFilePath[0];
+				this.formValidate.path = select_path
+			} else {
+
+			}
+		},
+		saveNewAPI() {
+			this.showModalNewAPI_loading = true;
+
+			var api_data = [];
+			if (fn.localStorage.get('API_DATA')) {
+				var temp = fn.localStorage.get('API_DATA');
+				temp = fn.serilizer.deserialize(temp);
+				api_data = temp;
+				api_data.push(this.formValidate)
+			} else {
+				api_data.push(this.formValidate)
+			}
+
+			fn.localStorage.set('API_DATA', fn.serilizer.serialize(api_data));
+			setTimeout(() => {
+				this.$Message.success('Success!');
+				this.showModalNewAPI_loading = false;
+				this.showModalNewAPI = false;
+			}, 2000);
 		},
 		deleteAll() {
 			// todo: opens modal to input  
 			console.log("deleteAll")
 		},
 		newAPI() {
-			// todo: opens modal to input  
-			// console.log("newAPI")
 			this.showModalNewAPI = true;
 		}
 	}
