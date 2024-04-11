@@ -4,8 +4,11 @@
 		<Card dis-hover>
 			<p slot="title">
 				<Icon type="ios-flash" :color="currentAPI ? '#19be6b' : 'red'" size="28" />
-				<span>Running: <span style="font-weight: bold;font-size: 16px;text-transform: uppercase;">{{ currentAPI
-					? currentAPI : 'None' }}</span></span>
+				<span>Running: <span style="font-weight: bold;font-size: 16px;text-transform: uppercase;">{{
+					currentRunningAPI
+						? currentRunningAPI.name + '::' + currentRunningAPI.url : 'None' }}</span></span>
+				<Icon v-if="currentRunningAPI" type="md-copy" color="#2d8cf0" size="20"
+					style="margin-left: 10px;cursor: pointer;" @click="copy()" />
 			</p>
 			<a href="#" slot="extra">
 				<Button :disabled="tableData.length == 0" @click.prevent="showDeleteApi = true;" type="error">Delete All
@@ -18,7 +21,8 @@
 			</a>
 
 			<div>
-				<cTable ref="cTable" @get-table-data="getTableData($event)"></cTable>
+				<cTable ref="cTable" @on-running="onRunning($event)" @on-stop-running="onOnStopRunning($event)"
+					@get-table-data="getTableData($event)"></cTable>
 			</div>
 		</Card>
 
@@ -80,6 +84,7 @@ export default {
 	},
 	data() {
 		return {
+			currentRunningAPI: null,
 			currentAPI: '',
 			showModalNewAPI: false,
 			showModalNewAPI_loading: false,
@@ -93,6 +98,9 @@ export default {
 				// name: '',
 				// url: '',
 				// path: '',
+
+				id: null,
+				isActivate: false
 			},
 			ruleValidate: {
 				name: [
@@ -113,10 +121,24 @@ export default {
 				this.formValidate.name = '';
 				this.formValidate.url = '';
 				this.formValidate.path = '';
+				this.formValidate.id = null;
+				this.formValidate.isActivate = false;
 			}
 		}
 	},
 	methods: {
+		copy() {
+			fn.copyText(this.currentRunningAPI.url, () => {
+				this.$Message.success('Copied');
+			})
+		},
+		onRunning(e) {
+			this.currentRunningAPI = e;
+			console.log("this.currentRunningAPI", this.currentRunningAPI)
+		},
+		onOnStopRunning(e) {
+			this.currentRunningAPI = null;
+		},
 		isValidUrl(string) {
 			try {
 				new URL(string);
@@ -201,8 +223,10 @@ export default {
 					var temp = fn.localStorage.get('API_DATA');
 					temp = fn.serilizer.deserialize(temp);
 					api_data = temp;
+					this.formValidate.id = api_data.length + 1;
 					api_data.unshift(this.formValidate)
 				} else {
+					this.formValidate.id = api_data.length + 1;
 					api_data.unshift(this.formValidate)
 				}
 
@@ -240,7 +264,6 @@ export default {
 		},
 		getTableData(e) {
 			this.tableData = e;
-			console.log("getTableData", e)
 		},
 	}
 }

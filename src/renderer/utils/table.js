@@ -1,4 +1,10 @@
 const tableAPICols = [
+	// {
+	// 	title: 'ID',
+	// 	key: 'id',
+	// 	align: 'center',
+	// 	width: 50
+	// },
 	{
 		title: 'Name',
 		key: 'name',
@@ -15,9 +21,9 @@ const tableAPICols = [
 	},
 	{
 		title: 'Status',
-		key: 'status',
+		key: 'isActivate',
 		align: 'center',
-		slot: 'status',
+		slot: 'isActivate',
 		width: 100
 	},
 	{

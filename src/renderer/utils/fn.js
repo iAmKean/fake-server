@@ -1,4 +1,5 @@
 // Utility functions for the application
+const { clipboard } = require('electron')
 const fn = {
 	// Serializer object for handling data transformation
 	serilizer: {
@@ -24,7 +25,12 @@ const fn = {
 			localStorage.removeItem(name);
 		},
 	},
-
+	copyText: (text, callback = undefined) => {
+		clipboard.writeText(text);
+		if (callback) {
+			callback()
+		}
+	}
 };
 
 export {

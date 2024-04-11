@@ -11,16 +11,16 @@
 				</div>
 			</template>
 
-			<template slot-scope="{ row, index }" slot="status">
+			<template slot-scope="{ row, index }" slot="isActivate">
 				<span :style="{
-			color: row.status ? '#19be6b' : 'red'
-		}">{{ row.status ? 'Running' : 'None' }}</span>
+			color: row.isActivate ? '#19be6b' : 'red'
+		}">{{ row.isActivate ? 'Running' : 'None' }}</span>
 			</template>
 
 			<template slot-scope="{ row, index }" slot="action">
-				<Button v-if="!row.status" type="warning" size="small"
-					@click="api_index = index; showDeleteApi = true;">Delete</Button>
-				<Button v-if="row.status" type="error" size="small" @click="shutDown(index)">Shutdown</Button>
+				<Button v-if="!row.isActivate" type="warning" size="small"
+					@click="showDeleteModal(index);">Delete</Button>
+				<Button v-if="row.isActivate" type="error" size="small" @click="shutDown(index)">Shutdown</Button>
 				<Button v-else type="success" size="small" @click="activate(index)">Activate</Button>
 			</template>
 
@@ -76,9 +76,35 @@ export default {
 				this.$emit("get-table-data", this.tableData)
 			}, 1000);
 		},
-		activate() { },
-		shutDown() { },
+		activate(index) {
+			let hasActive = this.tableData.find(item => item.isActivate);
+
+			if (hasActive) {
+				this.$Message.error('Please shutdown currently running API and try again.');
+			} else {
+				this.tableData[index].isActivate = true;
+			}
+
+			console.log("this.tableData", this.tableData)
+
+			this.$emit('on-running', this.tableData[index])
+		},
+		shutDown(index) {
+			this.tableData[index].isActivate = false;
+			this.$emit('on-stop-running', null)
+		},
 		copy() { },
+		showDeleteModal(index) {
+			let hasActive = this.tableData.find(item => item.isActivate);
+
+			if (hasActive) {
+				this.$Message.error('Please shutdown currently running API before deleting an item.');
+				return
+			}
+
+			this.api_index = index;
+			this.showDeleteApi = true;
+		},
 		deleteData(index) {
 			var temp = fn.localStorage.get('API_DATA');
 			temp = fn.serilizer.deserialize(temp);

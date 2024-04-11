@@ -42,7 +42,7 @@ function createWindow() {
 		minimizable: true,
 		maximizable: true,
 		closable: true,
-		frame: true,
+		frame: false,
 		skipTaskbar: false,
 		focusable: true,
 	};
