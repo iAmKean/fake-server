@@ -20,6 +20,11 @@ npm run build
 
 This project was generated with [electron-vue](https://github.com/SimulatedGREG/electron-vue)@[8d4ed60](https://github.com/SimulatedGREG/electron-vue/tree/8d4ed607d65300381a8f47d97923eb07832b1a9a) using [vue-cli](https://github.com/vuejs/vue-cli). Documentation about the original structure can be found [here](https://simulatedgreg.gitbooks.io/electron-vue/content/index.html).
 
+### git repo
+```
+https://github.com/iAmKean/fake-server
+```
+
 ### node version
 ```
 windows: 14.16.1
@@ -29,6 +34,7 @@ mac: null/not tested
 ### iview
 ```
 https://www.iviewui.com/docs/guide/install-en
+http://v4.iviewui.com/docs/introduce-en
 ```
 
 ### vue-i18n

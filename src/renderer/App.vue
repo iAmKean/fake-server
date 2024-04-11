@@ -1,15 +1,15 @@
 <template>
-  <div id="app">
-    <router-view></router-view>
-  </div>
+	<div id="app" class="theme-font-one">
+		<router-view></router-view>
+	</div>
 </template>
 
 <script>
-  export default {
-    name: 'fake-server'
-  }
+export default {
+	name: 'fake-server'
+}
 </script>
 
 <style>
-  /* CSS */
+/* CSS */
 </style>

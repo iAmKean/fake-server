@@ -4,15 +4,26 @@ import Router from 'vue-router'
 Vue.use(Router)
 
 export default new Router({
-  routes: [
-    {
-      path: '/',
-      name: 'landing-page',
-      component: require('@/components/LandingPage').default
-    },
-    {
-      path: '*',
-      redirect: '/'
-    }
-  ]
+	routes: [
+		{
+			path: '',
+			components: {
+				default: () => import('@/layout/index'),
+			},
+			children: [
+				{
+					path: '/',
+					name: 'landing-page',
+					components: {
+						default: () => import('@/views/landing/index'),
+						cNav: () => import('@/components/common/cNav')
+					},
+				},
+			],
+		},
+		{
+			path: '*',
+			redirect: '/'
+		}
+	]
 })

@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, ipcMain } from 'electron'
 import '../renderer/store'
 
 /**
@@ -53,6 +53,11 @@ function createWindow() {
 
 	mainWindow.on('closed', () => {
 		mainWindow = null
+	})
+
+	// custome events
+	ipcMain.on('on-closed', (event, arg) => {
+		app.quit()
 	})
 }
 
