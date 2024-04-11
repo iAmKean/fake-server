@@ -7,7 +7,7 @@
 				<div style="display: flex;align-items: center;justify-content: center;">
 					<span>{{ row.url }}</span>
 					<Icon type="md-copy" color="#2d8cf0" size="20" style="margin-left: 10px;cursor: pointer;"
-						@click="copy(row)" />
+						@click="copy(row.url)" />
 				</div>
 			</template>
 
@@ -93,7 +93,11 @@ export default {
 			this.tableData[index].isActivate = false;
 			this.$emit('on-stop-running', null)
 		},
-		copy() { },
+		copy(url) {
+			fn.copyText(url, () => {
+				this.$Message.success('Copied');
+			})
+		},
 		showDeleteModal(index) {
 			let hasActive = this.tableData.find(item => item.isActivate);
 
