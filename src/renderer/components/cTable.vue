@@ -61,18 +61,21 @@ export default {
 			cli_install_loading: false,
 		}
 	},
-	async created() {
-		if (fn.localStorage.get('CURRENT_PORT')) {
-			this.killPort(fn.localStorage.get('CURRENT_PORT'))
-			const delay = (ms) => new Promise(res => setTimeout(res, ms));
-			await delay(1000)
-			fn.localStorage.remove("CURRENT_PORT");
-		}
+	created() {
+		this.refreshPort();
 	},
 	mounted() {
 		this.getData();
 	},
 	methods: {
+		async refreshPort() {
+			if (fn.localStorage.get('CURRENT_PORT')) {
+				this.killPort(fn.localStorage.get('CURRENT_PORT'))
+				const delay = (ms) => new Promise(res => setTimeout(res, ms));
+				await delay(1000)
+				fn.localStorage.remove("CURRENT_PORT");
+			}
+		},
 		getData() {
 			setTimeout(() => {
 				if (fn.localStorage.get('API_DATA')) {
@@ -127,12 +130,7 @@ export default {
 				this.tableData[index].isActivate = true;
 			}
 
-			if (fn.localStorage.get('CURRENT_PORT')) {
-				this.killPort(fn.localStorage.get('CURRENT_PORT'))
-				const delay = (ms) => new Promise(res => setTimeout(res, ms));
-				await delay(2000)
-				fn.localStorage.remove("CURRENT_PORT");
-			}
+			await this.refreshPort();
 			fn.localStorage.set("CURRENT_PORT", this.getPort(this.tableData[index].url))
 
 			this.$emit('on-running', this.tableData[index])

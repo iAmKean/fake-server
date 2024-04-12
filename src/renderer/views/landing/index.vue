@@ -259,9 +259,10 @@ export default {
 				this.$Message.error('Error!');
 			}
 		},
-		refreshTableData() {
+		async refreshTableData() {
 			const { cTable } = this.$refs;
 			if (cTable) {
+				await cTable.refreshPort();
 				cTable.getData();
 			}
 		},
@@ -273,6 +274,7 @@ export default {
 				this.showDeleteApi_loading = false;
 				this.showDeleteApi = false;
 			}, 1000);
+
 
 			this.refreshTableData();
 		},
