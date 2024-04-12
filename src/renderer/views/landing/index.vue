@@ -3,7 +3,7 @@
 
 		<Card dis-hover>
 			<p slot="title">
-				<Icon type="ios-flash" :color="currentAPI ? '#19be6b' : 'red'" size="28" />
+				<Icon type="ios-flash" :color="currentRunningAPI ? '#19be6b' : 'red'" size="28" />
 				<span>Running: <span style="font-weight: bold;font-size: 16px;text-transform: uppercase;">{{
 					currentRunningAPI
 						? currentRunningAPI.name + '::' + currentRunningAPI.url : 'None' }}</span></span>
@@ -139,6 +139,15 @@ export default {
 		onOnStopRunning(e) {
 			this.currentRunningAPI = null;
 		},
+		hasPort(url) {
+			try {
+				const parsedUrl = new URL(url);
+				return parsedUrl.port !== "";
+			} catch (error) {
+				console.error("Invalid URL:", error);
+				return false; // or handle the error differently
+			}
+		},
 		isValidUrl(string) {
 			try {
 				new URL(string);
@@ -172,6 +181,14 @@ export default {
 					if (path.extname(this.formValidate.path) != '.js') {
 						this.$Message.error({
 							content: 'Please enter correct file. File extension must be *.js',
+							duration: 3
+						});
+						return
+					}
+
+					if (!this.hasPort(this.formValidate.url)) {
+						this.$Message.error({
+							content: 'Please enter correct URL and URL should have port.',
 							duration: 3
 						});
 						return

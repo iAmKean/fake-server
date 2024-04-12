@@ -124,3 +124,18 @@ sentry-wizard --integration electron
 #view issues
 https://sentry.io/account/settings/wizard/zy5a7dxql69xp01fchp0tp0ulzn72beoh5jm4ricc67br9nzetsgppoaydavxe5r/
 `
+```
+
+### node-cmd
+```
+npm i node-cmd --save
+```
+
+taskkill /f /im node.exe
+
+https://stackoverflow.com/questions/14790910/stop-all-instances-of-node-js-server
+
+
+npm install cross-port-killer -D
+
+https://stackoverflow.com/questions/39322089/node-js-port-3000-already-in-use-but-it-actually-isnt

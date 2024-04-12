@@ -44,6 +44,9 @@ import { tableAPICols } from "@/utils/table";
 import { fn } from "@/utils/fn";
 import cModal from "@/components/common/cModal"
 
+var cmd = require("node-cmd");
+
+import { kill, killer } from 'cross-port-killer';
 export default {
 	components: {
 		cModal
@@ -54,7 +57,16 @@ export default {
 			tableData: [],
 			api_index: -1,
 			showDeleteApi: false,
-			showDeleteApi_loading: false
+			showDeleteApi_loading: false,
+			cli_install_loading: false,
+		}
+	},
+	async created() {
+		if (fn.localStorage.get('CURRENT_PORT')) {
+			this.killPort(fn.localStorage.get('CURRENT_PORT'))
+			const delay = (ms) => new Promise(res => setTimeout(res, ms));
+			await delay(1000)
+			fn.localStorage.remove("CURRENT_PORT");
 		}
 	},
 	mounted() {
@@ -76,22 +88,87 @@ export default {
 				this.$emit("get-table-data", this.tableData)
 			}, 1000);
 		},
-		activate(index) {
+		getPort(url) {
+			try {
+				const parsedUrl = new URL(url);
+				// return parsedUrl.port || "default port for " + parsedUrl.protocol;
+				return parsedUrl.port || null;
+			} catch (error) {
+				console.error("Invalid URL:", error);
+				return null; // or handle the error differently
+			}
+		},
+		killPort(port) {
+			var self = this
+			kill(port).then(pids => {
+				console.log(pids)
+				// self.$Message.warning({
+				// 	content: 'Killed existing running port',
+				// 	duration: 3
+				// });
+			})
+		},
+		parsePort(url) {
+			let port = '';
+			return port;
+		},
+		async activate(index) {
+			if (!this.getPort(this.tableData[index].url)) {
+				this.$Message.error('Error running, please check url.');
+				return
+			}
+
 			let hasActive = this.tableData.find(item => item.isActivate);
 
 			if (hasActive) {
 				this.$Message.error('Please shutdown currently running API and try again.');
+				return
 			} else {
 				this.tableData[index].isActivate = true;
 			}
 
-			console.log("this.tableData", this.tableData)
+			if (fn.localStorage.get('CURRENT_PORT')) {
+				this.killPort(fn.localStorage.get('CURRENT_PORT'))
+				const delay = (ms) => new Promise(res => setTimeout(res, ms));
+				await delay(2000)
+				fn.localStorage.remove("CURRENT_PORT");
+			}
+			fn.localStorage.set("CURRENT_PORT", this.getPort(this.tableData[index].url))
 
 			this.$emit('on-running', this.tableData[index])
+
+			this.cli_install_loading = true;
+			let cli_command = `node ${this.tableData[index].path}`;
+
+			var self = this
+			cmd.run(cli_command, function (err, data, stderr) {
+				if (!err && data) {
+
+					setTimeout(() => {
+						self.$Message.success('Success');
+						self.cli_install_loading = false;
+					}, 500);
+
+				} else {
+
+					setTimeout(() => {
+						// self.$Message.error('Error running');
+						self.cli_install_loading = false;
+						self.tableData[index].isActivate = false;
+						self.$emit('on-stop-running', null)
+					}, 500)
+				}
+
+				console.log("err", err);
+				console.log("data", data);
+				console.log("stderr", stderr);
+			});
 		},
 		shutDown(index) {
 			this.tableData[index].isActivate = false;
-			this.$emit('on-stop-running', null)
+			this.$emit('on-stop-running', null);
+			this.killPort(fn.localStorage.get('CURRENT_PORT'))
+			fn.localStorage.remove("CURRENT_PORT");
 		},
 		copy(url) {
 			fn.copyText(url, () => {
