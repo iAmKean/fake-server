@@ -113,7 +113,7 @@ export default {
 				// url: 'https://jsdoc.app/about-getting-started',
 				// path: 'D:\\ThinkbitSolutionsProjects\\projects\\local-test-server\\index.js',
 				name: '',
-				url: '',
+				url: 'http://127.0.0.1:7001/', //default
 				path: '',
 
 				id: null,
@@ -169,10 +169,17 @@ export default {
 				});
 
 				setTimeout(() => {
-					self.showInstall = true;
+					self.$Notice.success({
+						title: '',
+						desc: 'Download completed!'
+					});
 				}, 1000);
 			} catch (error) {
 				console.log('File failed to create.');
+				self.$Notice.success({
+					title: '',
+					desc: 'Download failed!'
+				});
 			}
 
 		})

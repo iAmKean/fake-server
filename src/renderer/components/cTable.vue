@@ -3,6 +3,28 @@
 	<div>
 		<Table border :columns="columns" :data="tableData" :no-data-text="'Empty'">
 
+			<template slot-scope="{ row, index }" slot="path">
+
+				<div style="display: flex;align-items: center;">
+					<Tooltip placement="top">
+						<Icon type="ios-information-circle" size="18" style="margin-right: 5px;" />
+						<div slot="content">
+							<p style="color:#fff;">Note: Folder names should not contain white spaces</p>
+						</div>
+					</Tooltip>
+
+					<span>{{ row.path }}</span>
+
+					<Tooltip placement="top">
+						<Icon type="ios-folder-open" color="#2d8cf0" size="20"
+							style="margin-left: 10px;cursor: pointer;" @click="openFolder(row.path)" />
+						<div slot="content">
+							<p style="color:#fff;">Open folder and do `npm install`</p>
+						</div>
+					</Tooltip>
+				</div>
+			</template>
+
 			<template slot-scope="{ row, index }" slot="url">
 				<div style="display: flex;align-items: center;justify-content: center;">
 					<span>{{ row.url }}</span>
@@ -45,7 +67,7 @@ import { fn } from "@/utils/fn";
 import cModal from "@/components/common/cModal"
 
 var cmd = require("node-cmd");
-
+const { shell } = require('electron')
 import { kill, killer } from 'cross-port-killer';
 export default {
 	components: {
@@ -68,6 +90,9 @@ export default {
 		this.getData();
 	},
 	methods: {
+		openFolder(path) {
+			shell.showItemInFolder(path) // Show the given file in a file manager. If possible, select the file.
+		},
 		async refreshPort() {
 			if (fn.localStorage.get('CURRENT_PORT')) {
 				this.killPort(fn.localStorage.get('CURRENT_PORT'))
@@ -116,6 +141,7 @@ export default {
 			return port;
 		},
 		async activate(index) {
+			// todo: check if there is a node modules
 			if (!this.getPort(this.tableData[index].url)) {
 				this.$Message.error('Error running, please check url.');
 				return
@@ -150,7 +176,7 @@ export default {
 				} else {
 
 					setTimeout(() => {
-						// self.$Message.error('Error running');
+						// self.$Message.error('Error running, please check node_modules folder if installed or the index file.');
 						self.cli_install_loading = false;
 						self.tableData[index].isActivate = false;
 						self.$emit('on-stop-running', null)
@@ -159,7 +185,6 @@ export default {
 
 				console.log("err", err);
 				console.log("data", data);
-				console.log("stderr", stderr);
 			});
 		},
 		shutDown(index) {

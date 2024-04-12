@@ -12,6 +12,7 @@ const tableAPICols = [
 	{
 		title: 'Path',
 		key: 'path',
+		slot: 'path',
 	},
 	{
 		title: 'URL',
