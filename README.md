@@ -61,23 +61,11 @@ mainWindow = new BrowserWindow({
 https://stackoverflow.com/questions/44205831/using-electron-to-access-cross-origin-resources
 ```
 
-### serial port
-```
-npm install serialport@9
-npm install electron-rebuild
- ./node_modules/.bin/electron-rebuild
-
-```
 
 ### to white list plugins
 ```
 file:  .electron-vue/webpack.renderer.config.js
 let whiteListedModules = ['vue', 'view-design', 'iview', 'vuedraggable', 'wavesurfer.js', 'konva', 'vue-konva']
-```
-
-### build in mac to avoid the blank page
-```
-npm run pack && electron-builder build
 ```
 
 
@@ -111,25 +99,10 @@ npm rebuild node-sass || npm uninstall node-sass && npm install node-sass
 ```
 
 
-###
-```
-https://docs.sentry.io/platforms/javascript/guides/electron/
-
-npm install @sentry/electron
-
-
-npm install -g @sentry/wizard
-sentry-wizard --integration electron
-
-#view issues
-https://sentry.io/account/settings/wizard/zy5a7dxql69xp01fchp0tp0ulzn72beoh5jm4ricc67br9nzetsgppoaydavxe5r/
-`
-```
-
 ### node-cmd
 ```
 npm i node-cmd --save
-```
+
 
 taskkill /f /im node.exe
 
@@ -139,3 +112,11 @@ https://stackoverflow.com/questions/14790910/stop-all-instances-of-node-js-serve
 npm install cross-port-killer -D
 
 https://stackoverflow.com/questions/39322089/node-js-port-3000-already-in-use-but-it-actually-isnt
+
+```
+
+### electron-dl
+```
+npm i electron-dl
+https://www.npmjs.com/package/electron-dl
+```

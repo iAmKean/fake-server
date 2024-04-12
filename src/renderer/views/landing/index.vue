@@ -11,6 +11,10 @@
 					style="margin-left: 10px;cursor: pointer;" @click="copy()" />
 			</p>
 			<a href="#" slot="extra">
+				<Button @click.prevent="downloadTemplate()" type="primary">Get Template
+					<Icon type="md-code-download" size="20" />
+				</Button>
+
 				<Button :disabled="tableData.length == 0" @click.prevent="showDeleteApi = true;" type="error">Delete All
 					<Icon class="trash-icon" type="md-trash" size="20" />
 				</Button>
@@ -64,16 +68,26 @@
 			</template>
 		</cModal>
 
+		<cModal :width="350" :title="'Success Download'" :okText="'Install Now'" :showModal="showInstall"
+			:type="'warning'" :isClickOK="showInstall_loading" @ok="confirmInstall()" @close="showInstall = false;">
+			<template slot="bodycontent">
+				<div style="text-align: center">
+					Want to run <span style="font-weight: bold;">npm install</span>?
+				</div>
+			</template>
+		</cModal>
+
 	</div>
 </template>
 
 <script>
 import cTable from "@/components/cTable"
 import cModal from "@/components/common/cModal"
-// import { remote } from "electron";
-
+import { remote } from "electron";
+import { ipcRenderer } from "electron";
 const fs = require("fs");
 const path = require("path");
+var cmd = require("node-cmd");
 
 import { fn } from "@/utils/fn";
 export default {
@@ -84,20 +98,23 @@ export default {
 	},
 	data() {
 		return {
+			selected_path: '',
 			currentRunningAPI: null,
 			currentAPI: '',
 			showModalNewAPI: false,
 			showModalNewAPI_loading: false,
 			showDeleteApi: false,
 			showDeleteApi_loading: false,
+			showInstall: false,
+			showInstall_loading: false,
 			tableData: [],
 			formValidate: {
-				name: 'test',
-				url: 'https://jsdoc.app/about-getting-started',
-				path: 'D:\\ThinkbitSolutionsProjects\\projects\\local-test-server\\index.js',
-				// name: '',
-				// url: '',
-				// path: '',
+				// name: 'test',
+				// url: 'https://jsdoc.app/about-getting-started',
+				// path: 'D:\\ThinkbitSolutionsProjects\\projects\\local-test-server\\index.js',
+				name: '',
+				url: '',
+				path: '',
 
 				id: null,
 				isActivate: false
@@ -126,7 +143,89 @@ export default {
 			}
 		}
 	},
+	mounted() {
+		var self = this
+		ipcRenderer.on('download-software-success', (event, args) => {
+			// console.log("download-software-success");
+			// self.$Notice.success({
+			// 	title: '',
+			// 	desc: 'download complete'
+			// });
+
+			try {
+				let config = {
+					"dependencies": {
+						"body-parser": "^1.20.2",
+						"express": "^4.19.2",
+						"nodemon": "^3.1.0"
+					}
+				}
+
+				fs.writeFileSync(`${self.selected_path}\\package.json`, JSON.stringify(config, null, 4), "utf8", (err) => {
+					if (err) {
+						return console.log(err);
+					}
+					console.log('File was saved');
+				});
+
+				setTimeout(() => {
+					self.showInstall = true;
+				}, 1000);
+			} catch (error) {
+				console.log('File failed to create.');
+			}
+
+		})
+	},
 	methods: {
+		confirmInstall() {
+			let cli_command = `npm install --prefix ${this.selected_path}`;
+			var self = this
+			this.showInstall_loading = true;
+			cmd.run(cli_command, function (err, data, stderr) {
+				if (!err && data) {
+
+					setTimeout(() => {
+						self.$Message.success('Npm Install success!');
+						self.showInstall_loading = false;
+						self.showInstall = false;
+					}, 500);
+
+				} else {
+
+					setTimeout(() => {
+						self.$Message.error('Failed to install');
+						self.showInstall_loading = false;
+						self.showInstall = false;
+					}, 500)
+				}
+
+				console.log("err", err);
+				console.log("data", data);
+				console.log("stderr", stderr);
+			});
+		},
+		downloadTemplate() {
+			var dialog = this.$electron.remote.dialog;
+			var selectedPath = dialog.showOpenDialog(remote.getCurrentWindow(), {
+				title: "Select download path",
+				defaultPath: "",
+				properties: ["openDirectory"],
+				buttonLabel: "Select",
+			});
+
+			if (selectedPath) {
+				var path = selectedPath[0];
+				this.selected_path = path;
+
+				ipcRenderer.send('download-software-start', {
+					url: 'https://iamkean.github.io/fake-server-tempate/index.js',
+					properties: {
+						directory: path
+					}
+				});
+			}
+		},
 		copy() {
 			fn.copyText(this.currentRunningAPI.url, () => {
 				this.$Message.success('Copied');
